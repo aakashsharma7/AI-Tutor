@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pdb
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual environment
+.venv/
+env/
+ENV/
+venv/
+
+# VSCode settings
+.vscode/
+
+# macOS
+.DS_Store
+
+# Pytest
+.cache/
+
+# Uvicorn logs
+*.log
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# dotenv
+.env
+
+# MyPy
+.mypy_cache/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+
+# PyInstaller
+*.spec
