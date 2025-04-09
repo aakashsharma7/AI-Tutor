@@ -8,7 +8,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Get database URL from environment variable
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://noendb_owner:npg_R1L3lZPbIYhH@ep-soft-violet-a4rp7n6k-pooler.us-east-1.aws.neon.tech/noendb?sslmode=require")
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL environment variable is not set")
 
 # Create SQLAlchemy engine
 engine = create_engine(DATABASE_URL)
