@@ -2,8 +2,8 @@
 
 // Base URL for API requests
 const API_URL = process.env.NODE_ENV === 'production' 
-  ? '/api' // In production, use relative path
-  : 'http://localhost:8000'; // In development, use the proxy
+  ? 'https://ai-tutor-io.vercel.app/' // Your Render backend URL
+  : 'http://localhost:8000'; // In development, use the local backend
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
