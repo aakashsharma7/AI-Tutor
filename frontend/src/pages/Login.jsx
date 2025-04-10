@@ -16,7 +16,7 @@ const Login = () => {
   useEffect(() => {
     // Check if already logged in
     if (authAPI.isAuthenticated()) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [navigate]);
 
@@ -27,7 +27,7 @@ const Login = () => {
     try {
       const data = await authAPI.login(username, password);
       authAPI.setToken(data.access_token);
-      navigate('/');
+      navigate('/dashboard');
     } catch (error) {
       toast({
         variant: "destructive",
@@ -70,6 +70,7 @@ const Login = () => {
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 placeholder="Enter your username"
+                disabled={isLoading}
               />
             </div>
             <div className="space-y-2">
@@ -83,6 +84,7 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="Enter your password"
+                disabled={isLoading}
               />
             </div>
             <Button
