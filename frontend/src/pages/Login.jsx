@@ -27,6 +27,8 @@ const Login = () => {
     try {
       const data = await authAPI.login(username, password);
       authAPI.setToken(data.access_token);
+      // Store username in localStorage
+      localStorage.setItem('username', username);
       navigate('/dashboard');
     } catch (error) {
       toast({
@@ -40,27 +42,35 @@ const Login = () => {
   };
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{
-        backgroundImage: "url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}
-    >
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-      <Card className="w-full max-w-md relative z-10 bg-white/90 backdrop-blur-sm">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Video Background */}
+      <div className="absolute inset-0 w-full h-full">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute w-full h-full object-cover"
+        >
+          <source src="/videos/background.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        {/* Overlay to ensure text readability */}
+        <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
+      </div>
+
+      {/* Login Form */}
+      <Card className="w-full max-w-md relative z-10 bg-black/60 backdrop-blur-sm">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">AI Tutor Login</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center text-white">Welcome</CardTitle>
           <CardDescription className="text-center">
-            Enter your credentials to access the AI Tutor
+            Enter your credentials to access your account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="username" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <label htmlFor="username" className="text-sm font-medium text-white">
                 Username
               </label>
               <Input
@@ -69,12 +79,12 @@ const Login = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                placeholder="Enter your username"
                 disabled={isLoading}
+                placeholder="Enter your username"
               />
             </div>
             <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              <label htmlFor="password" className="text-sm font-medium text-white">
                 Password
               </label>
               <Input
@@ -83,31 +93,24 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                placeholder="Enter your password"
                 disabled={isLoading}
+                placeholder="Enter your password"
               />
             </div>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? "Logging in..." : "Login"}
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? 'Logging in...' : 'Login'}
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-2">
-          {/* <p className="text-xs text-center text-muted-foreground">
-            Use testuser / testpassword to login
-          </p> */}
-          <p className="text-sm text-center text-muted-foreground">
+        <CardFooter className="flex justify-center">
+          <p className="text-sm text-gray-500">
             Don't have an account?{' '}
-            <button
-              onClick={() => navigate('/signup')}
-              className="text-primary hover:underline"
+            <a
+              href="/signup"
+              className="text-indigo-600 hover:text-indigo-500 font-medium"
             >
-              Sign up here
-            </button>
+              Sign up
+            </a>
           </p>
         </CardFooter>
       </Card>

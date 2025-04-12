@@ -9,7 +9,7 @@ function App() {
     <Router>
       <div className="App">
         <header className="App-header">
-          <h1>AI Tutor</h1>
+          {/* <h1>AI Tutor</h1> */}
         </header>
         <main>
           <Routes>

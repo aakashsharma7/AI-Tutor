@@ -10,12 +10,17 @@ const Dashboard = () => {
   const [topic, setTopic] = useState('');
   const [responses, setResponses] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [username, setUsername] = useState('');
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     if (!authAPI.isAuthenticated()) {
       navigate('/login');
+    } else {
+      // Get username from localStorage
+      const storedUsername = localStorage.getItem('username');
+      setUsername(storedUsername || 'User');
     }
   }, [navigate]);
 
@@ -43,62 +48,34 @@ const Dashboard = () => {
     }
   };
 
-  const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    setIsLoading(true);
-    try {
-      const response = await tutorAPI.uploadDocument(file);
-      setResponses(prev => [...prev, { question: 'Document Upload', answer: response }]);
-      toast({
-        title: "Success",
-        description: "Document uploaded successfully!",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message || 'Failed to upload document',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleLogout = () => {
     authAPI.logout();
+    localStorage.removeItem('username'); // Clear username on logout
     navigate('/login');
   };
 
   return (
-    <div 
-      className="min-h-screen p-4 bg-black"
-      // style={{
-      //   backgroundImage: "url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')",
-      //   backgroundSize: 'cover',
-      //   backgroundPosition: 'center',
-      //   backgroundRepeat: 'no-repeat',
-      //   backgroundAttachment: 'fixed',
-      // }}
-    >
+    <div className="min-h-screen p-4 bg-black">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
       <div className="max-w-4xl mx-auto relative z-10">
-        <div className="flex items-center justify-center">
-          <h1 className="text-3xl font-bold text-white ">AI Tutor Dashboard</h1>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center space-x-4">
+            {/* <h1 className="text-3xl font-bold text-white">AI Tutor</h1> */}
+            <span className="text-white text-lg">Welcome, {username}</span>
+          </div>
           <Button
             variant="outline"
             onClick={handleLogout}
-            className="bg-white text-gray-800 hover:bg-blue-50 m-8 right-8"
+            className="bg-white/10 text-white hover:bg-white/20 border-white/20"
           >
             Logout
           </Button>
         </div>
 
-        <Card className="mb-8 bg-white/90 backdrop-blur-sm">
+        <Card className="mb-10 bg-white/30 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle>Ask a Question</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-white">Ask a Question</CardTitle>
+            <CardDescription className="text-white">
               Enter your question below and get an AI-powered response
             </CardDescription>
           </CardHeader>
@@ -110,11 +87,12 @@ const Dashboard = () => {
                 onChange={(e) => setTopic(e.target.value)}
                 placeholder="Enter your question here..."
                 disabled={isLoading}
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
               />
               <Button
                 type="submit"
                 disabled={isLoading || !topic.trim()}
-                className="w-full"
+                className="w-full bg-white/10 hover:bg-white/20 text-white"
               >
                 {isLoading ? "Getting Answer..." : "Ask Question"}
               </Button>
@@ -122,31 +100,14 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="mb-8 bg-white/90 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle>Upload Document</CardTitle>
-            <CardDescription>
-              Upload a document for the AI to analyze
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Input
-              type="file"
-              onChange={handleFileUpload}
-              disabled={isLoading}
-              accept=".pdf,.doc,.docx,.txt"
-            />
-          </CardContent>
-        </Card>
-
         <div className="space-y-4">
           {responses.map((response, index) => (
-            <Card key={index} className="bg-white/90 backdrop-blur-sm">
+            <Card key={index} className="bg-white/30 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="text-lg">Q: {response.question}</CardTitle>
+                <CardTitle className="text-lg text-white">Q: {response.question}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="whitespace-pre-wrap">{response.answer}</p>
+                <p className="whitespace-pre-wrap text-white/90">{response.answer}</p>
               </CardContent>
             </Card>
           ))}

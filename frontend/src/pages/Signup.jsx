@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { useToast } from '../components/ui/use-toast';
+import { Label } from '../components/ui/label';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -32,15 +33,15 @@ const Signup = () => {
     try {
       await authAPI.signup(formData);
       toast({
-        title: "Signup Successful",
-        description: "Please login with your new account",
+        title: "Account created successfully",
+        description: "Please log in with your new account",
       });
       navigate('/login');
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Signup Failed",
-        description: error.message || 'Failed to create account',
+        title: "Error",
+        description: error.message || "Something went wrong. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -48,29 +49,35 @@ const Signup = () => {
   };
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{
-        backgroundImage: "url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-      }}
-    >
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-      <Card className="w-full max-w-md relative z-10 bg-white/90 backdrop-blur-sm">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Video Background */}
+      <div className="absolute inset-0 w-full h-full">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute w-full h-full object-cover"
+        >
+          <source src="/videos/background.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        {/* Overlay to ensure text readability */}
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+      </div>
+
+      {/* Signup Form */}
+      <Card className="w-full max-w-md relative z-10 bg-black/60 backdrop-blur-sm">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Create Account</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center text-white">Create an account</CardTitle>
           <CardDescription className="text-center">
-            Sign up for AI Tutor to get started
+            Enter your information below to create your account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="username" className="text-sm font-medium leading-none">
-                Username
-              </label>
+            <div className="space-y-2 text-white">
+              <Label htmlFor="username">Username</Label>
               <Input
                 id="username"
                 name="username"
@@ -79,12 +86,11 @@ const Signup = () => {
                 onChange={handleChange}
                 required
                 placeholder="Choose a username"
+                disabled={isLoading}
               />
             </div>
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium leading-none">
-                Email
-              </label>
+            <div className="space-y-2 text-white">
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 name="email"
@@ -93,12 +99,11 @@ const Signup = () => {
                 onChange={handleChange}
                 required
                 placeholder="Enter your email"
+                disabled={isLoading}
               />
             </div>
-            <div className="space-y-2">
-              <label htmlFor="full_name" className="text-sm font-medium leading-none">
-                Full Name
-              </label>
+            <div className="space-y-2 text-white">
+              <Label htmlFor="full_name">Full Name</Label>
               <Input
                 id="full_name"
                 name="full_name"
@@ -106,12 +111,11 @@ const Signup = () => {
                 value={formData.full_name}
                 onChange={handleChange}
                 placeholder="Enter your full name"
+                disabled={isLoading}
               />
             </div>
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium leading-none">
-                Password
-              </label>
+            <div className="space-y-2 text-white">
+              <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
                 name="password"
@@ -119,7 +123,8 @@ const Signup = () => {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                placeholder="Choose a password"
+                placeholder="Create a password"
+                disabled={isLoading}
               />
             </div>
             <Button
