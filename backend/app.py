@@ -50,7 +50,9 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "")
 ALLOWED_ORIGINS = [
     FRONTEND_URL,
     "http://localhost:3000",  # Local development
-    "http://localhost:5000"   # Local development alternative
+    "http://localhost:5000",   # Local development alternative
+    "https://ai-tutor-fe-zeta.vercel.app",  # Frontend production
+    "https://ai-tutor-fe-zeta.vercel.app"  # Frontend alternative domain
 ]
 
 app.add_middleware(
@@ -78,7 +80,7 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel("gemini-1.5-pro")
 
 # Secret key for JWT
-SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-here")
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 
