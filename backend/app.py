@@ -21,6 +21,7 @@ import schemas
 from database import get_db, engine
 import models
 from fastapi.responses import JSONResponse
+import httpx
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -106,6 +107,11 @@ class TokenData(BaseModel):
 # Query model
 class Query(BaseModel):
     topic: str
+
+# Google OAuth settings
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:3000/auth/google/callback")
 
 def get_user(db: Session, username: str):
     return db.query(models.User).filter(models.User.username == username).first()
@@ -320,6 +326,87 @@ async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
         status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         content={"detail": "Database error occurred. Please try again later."}
     )
+
+# Google OAuth endpoints
+@app.post("/auth/google", response_model=schemas.GoogleAuthResponse)
+async def google_auth(google_token: dict, db: Session = Depends(get_db)):
+    """
+    Authenticate user with Google token
+    """
+    try:
+        # Verify the token with Google
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"https://www.googleapis.com/oauth2/v3/userinfo?access_token={google_token['access_token']}"
+            )
+            
+            if response.status_code != 200:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid Google token"
+                )
+            
+            user_info = response.json()
+            google_id = user_info["sub"]
+            email = user_info["email"]
+            full_name = user_info.get("name")
+            picture = user_info.get("picture")
+            
+            # Check if user exists
+            user = db.query(models.User).filter(models.User.google_id == google_id).first()
+            
+            if not user:
+                # Check if user exists with this email
+                user = db.query(models.User).filter(models.User.email == email).first()
+                
+                if user:
+                    # Update existing user with Google ID
+                    user.google_id = google_id
+                    user.picture = picture
+                    db.commit()
+                else:
+                    # Create new user
+                    username = email.split('@')[0]  # Use email prefix as username
+                    # Check if username exists
+                    existing_user = db.query(models.User).filter(models.User.username == username).first()
+                    if existing_user:
+                        # Add random number to username
+                        import random
+                        username = f"{username}{random.randint(1000, 9999)}"
+                    
+                    user = models.User(
+                        username=username,
+                        email=email,
+                        full_name=full_name,
+                        google_id=google_id,
+                        picture=picture
+                    )
+                    db.add(user)
+                    db.commit()
+                    db.refresh(user)
+            
+            # Create access token
+            access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+            access_token = create_access_token(
+                data={"sub": user.username}, expires_delta=access_token_expires
+            )
+            
+            return {
+                "access_token": access_token,
+                "token_type": "bearer",
+                "user": {
+                    "username": user.username,
+                    "email": user.email,
+                    "full_name": user.full_name
+                }
+            }
+            
+    except Exception as e:
+        logger.error(f"Google authentication error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Authentication failed"
+        )
 
 if __name__ == "__main__":
     import uvicorn

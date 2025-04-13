@@ -26,6 +26,18 @@ class DocumentCreate(DocumentBase):
 class UserCreate(UserBase):
     password: str
 
+# Google authentication schemas
+class GoogleUserInfo(BaseModel):
+    google_id: str
+    email: EmailStr
+    full_name: Optional[str] = None
+    picture: Optional[str] = None
+
+class GoogleAuthResponse(BaseModel):
+    access_token: str
+    token_type: str
+    user: UserBase
+
 # Read models
 class Query(QueryBase):
     id: int
@@ -48,6 +60,7 @@ class User(UserBase):
     id: int
     disabled: bool
     created_at: datetime
+    picture: Optional[str] = None
     queries: List[Query] = []
     documents: List[Document] = []
 

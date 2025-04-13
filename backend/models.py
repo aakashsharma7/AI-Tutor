@@ -15,10 +15,14 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     email = Column(String, unique=True, index=True)
     full_name = Column(String, nullable=True)
-    hashed_password = Column(String)
+    hashed_password = Column(String, nullable=True)  # Make password nullable for Google auth
     disabled = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    # Google authentication fields
+    google_id = Column(String, unique=True, nullable=True)
+    picture = Column(String, nullable=True)
     
     # Relationships
     queries = relationship("Query", back_populates="user")
