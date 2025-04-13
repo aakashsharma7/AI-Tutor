@@ -12,9 +12,6 @@ from jose import jwt, JWTError
 from passlib.context import CryptContext
 import logging
 from cachetools import TTLCache
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 import schemas
@@ -65,15 +62,6 @@ app.add_middleware(
     expose_headers=["*"],
     max_age=3600,
 )
-
-# Initialize rate limiter with default values if not in env
-RATE_LIMIT_DEFAULT = "5/minute"
-limiter = Limiter(
-    key_func=get_remote_address,
-    default_limits=[os.getenv("RATE_LIMIT", RATE_LIMIT_DEFAULT)]
-)
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Initialize cache
 cache = TTLCache(maxsize=100, ttl=300)  # Cache for 5 minutes
@@ -233,7 +221,6 @@ async def read_users_me(current_user: models.User = Depends(get_current_user)):
     return current_user
 
 @app.post("/tutor")
-@limiter.limit("5/minute")
 async def educational_tutor(
     request: Request,
     query: Query,
@@ -280,7 +267,6 @@ async def educational_tutor(
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/tutor")
-@limiter.limit("5/minute")
 async def educational_tutor_get(
     request: Request,
     topic: str,
@@ -290,7 +276,6 @@ async def educational_tutor_get(
     return await educational_tutor(request, query, current_user)
 
 @app.post("/upload")
-@limiter.limit("3/minute")
 async def upload_file(
     request: Request,
     file: UploadFile = File(...),
