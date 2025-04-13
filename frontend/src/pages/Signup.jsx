@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { authAPI } from '../services/api';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { useToast } from '../components/ui/use-toast';
 import { Label } from '../components/ui/label';
+import GoogleLogin from '../components/GoogleLogin';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -63,21 +64,21 @@ const Signup = () => {
           Your browser does not support the video tag.
         </video>
         {/* Overlay to ensure text readability */}
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+        <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
       </div>
 
       {/* Signup Form */}
       <Card className="w-full max-w-md relative z-10 bg-black/60 backdrop-blur-sm">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center text-white">Create an account</CardTitle>
-          <CardDescription className="text-center">
+          <CardDescription className="text-center text-white/70">
             Enter your information below to create your account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2 text-white">
-              <Label htmlFor="username">Username</Label>
+            <div className="space-y-2">
+              <Label htmlFor="username" className="text-white">Username</Label>
               <Input
                 id="username"
                 name="username"
@@ -87,10 +88,11 @@ const Signup = () => {
                 required
                 placeholder="Choose a username"
                 disabled={isLoading}
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
               />
             </div>
-            <div className="space-y-2 text-white">
-              <Label htmlFor="email">Email</Label>
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-white">Email</Label>
               <Input
                 id="email"
                 name="email"
@@ -100,10 +102,11 @@ const Signup = () => {
                 required
                 placeholder="Enter your email"
                 disabled={isLoading}
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
               />
             </div>
-            <div className="space-y-2 text-white">
-              <Label htmlFor="full_name">Full Name</Label>
+            <div className="space-y-2">
+              <Label htmlFor="full_name" className="text-white">Full Name</Label>
               <Input
                 id="full_name"
                 name="full_name"
@@ -112,10 +115,11 @@ const Signup = () => {
                 onChange={handleChange}
                 placeholder="Enter your full name"
                 disabled={isLoading}
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
               />
             </div>
-            <div className="space-y-2 text-white">
-              <Label htmlFor="password">Password</Label>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-white">Password</Label>
               <Input
                 id="password"
                 name="password"
@@ -125,26 +129,35 @@ const Signup = () => {
                 required
                 placeholder="Create a password"
                 disabled={isLoading}
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
               />
             </div>
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-white/10 hover:bg-white/20 text-white"
               disabled={isLoading}
             >
               {isLoading ? "Creating account..." : "Sign Up"}
             </Button>
           </form>
+          
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/20"></div>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-black/60 px-2 text-white/50">Or continue with</span>
+            </div>
+          </div>
+          
+          <GoogleLogin />
         </CardContent>
-        <CardFooter className="flex flex-col space-y-2">
-          <p className="text-sm text-center text-muted-foreground">
+        <CardFooter className="flex justify-center">
+          <p className="text-sm text-white/70">
             Already have an account?{' '}
-            <button
-              onClick={() => navigate('/login')}
-              className="text-primary hover:underline"
-            >
-              Login here
-            </button>
+            <Link to="/login" className="text-white hover:underline">
+              Login
+            </Link>
           </p>
         </CardFooter>
       </Card>

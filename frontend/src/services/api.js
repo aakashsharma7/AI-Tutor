@@ -55,6 +55,19 @@ export const authAPI = {
     return handleResponse(response);
   },
   
+  // Google authentication
+  googleAuth: async (googleToken) => {
+    const response = await fetch(`${API_URL}/auth/google`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ access_token: googleToken }),
+    });
+    
+    return handleResponse(response);
+  },
+  
   // Check if user is authenticated
   isAuthenticated: () => {
     return !!localStorage.getItem('token');
