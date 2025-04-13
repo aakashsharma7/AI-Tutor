@@ -28,7 +28,10 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Load environment variables
-load_dotenv()
+if os.path.exists('.env'):
+    load_dotenv()
+else:
+    logger.info("No .env file found, using environment variables")
 
 try:
     # Create database tables
@@ -46,7 +49,7 @@ app = FastAPI(
 )
 
 # Configure CORS with proper origins
-FRONTEND_URL = os.getenv("FRONTEND_URL", "https://ai-tutor-io.vercel.app/")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "")
 ALLOWED_ORIGINS = [
     FRONTEND_URL,
     "http://localhost:3000",  # Local development
@@ -63,8 +66,12 @@ app.add_middleware(
     max_age=3600,
 )
 
-# Initialize rate limiter
-limiter = Limiter(key_func=get_remote_address)
+# Initialize rate limiter with default values if not in env
+RATE_LIMIT_DEFAULT = "5/minute"
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=[os.getenv("RATE_LIMIT", RATE_LIMIT_DEFAULT)]
+)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
