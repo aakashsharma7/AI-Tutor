@@ -23,7 +23,9 @@ const Dashboard = () => {
 
   // Save responses to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('responses', JSON.stringify(responses));
+    if (responses.length > 0) {
+      localStorage.setItem('responses', JSON.stringify(responses));
+    }
   }, [responses]);
 
   useEffect(() => {
@@ -44,11 +46,21 @@ const Dashboard = () => {
     try {
       const response = await tutorAPI.askQuestion(topic);
       const newResponse = { 
+        id: Date.now(), // Add unique ID for each response
         question: topic, 
         answer: response,
-        timestamp: new Date().toISOString() // Add timestamp for sorting
+        timestamp: new Date().toISOString()
       };
-      setResponses(prev => [...prev, newResponse]);
+      
+      // Update responses state with the new response
+      setResponses(prevResponses => {
+        const updatedResponses = [...prevResponses, newResponse];
+        // Sort responses by timestamp in descending order (newest first)
+        return updatedResponses.sort((a, b) => 
+          new Date(b.timestamp) - new Date(a.timestamp)
+        );
+      });
+      
       setTopic('');
       toast({
         title: "Success",
