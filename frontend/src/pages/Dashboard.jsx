@@ -23,9 +23,7 @@ const Dashboard = () => {
 
   // Save responses to localStorage whenever they change
   useEffect(() => {
-    if (responses.length > 0) {
-      localStorage.setItem('responses', JSON.stringify(responses));
-    }
+    localStorage.setItem('responses', JSON.stringify(responses));
   }, [responses]);
 
   useEffect(() => {
@@ -44,10 +42,15 @@ const Dashboard = () => {
 
     setIsLoading(true);
     try {
-      const response = await tutorAPI.askQuestion(topic);
+      // Store the current question before making the API call
+      const currentQuestion = topic;
+      
+      const response = await tutorAPI.askQuestion(currentQuestion);
+      
+      // Create a new response object with the current question and the received answer
       const newResponse = { 
         id: Date.now(), // Add unique ID for each response
-        question: topic, 
+        question: currentQuestion, 
         answer: response,
         timestamp: new Date().toISOString()
       };
@@ -61,7 +64,9 @@ const Dashboard = () => {
         );
       });
       
+      // Clear the input field after successful submission
       setTopic('');
+      
       toast({
         title: "Success",
         description: "Your question has been answered!",
@@ -156,7 +161,7 @@ const Dashboard = () => {
                   onChange={(e) => setTopic(e.target.value)}
                   placeholder="Enter your question here..."
                   disabled={isLoading}
-                  className="bg-white/5 border-white/10 text-white placeholder:text-white/50 focus:border-white/20"
+                  className="bg-white/5 border-0 text-white placeholder:text-white/50 focus:border-0 focus:ring-0"
                 />
                 <Button
                   type="submit"
@@ -180,7 +185,7 @@ const Dashboard = () => {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <Card className="bg-white/5 backdrop-blur-sm border-white/10 shadow-xl hover:bg-white/10 transition-colors duration-200">
+                <Card className="bg-white/5 backdrop-blur-sm border-0 shadow-xl hover:bg-white/10 transition-colors duration-200">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-lg text-white/90">Question: {response.question}</CardTitle>
                     <Button
